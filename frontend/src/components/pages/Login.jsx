@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Link, Outlet, useNavigate } from 'react-router-dom'
 
 
@@ -8,7 +8,16 @@ const Login = () => {
     const [FormData,setData]=useState({
         mobileno:"",password:""
     });
+    const [backendData,setBackEndData]=useState([{}]);
 
+    useEffect(()=>{
+        fetch("http://localhost:4000/service/v1/users/login").then(response=>response.json()
+        ).then(
+            data=>{
+                setBackEndData(data)
+            }
+        )
+    },[])
     const handleInput=(e)=>{
         e.preventDefault();
         const name=e.target.name;

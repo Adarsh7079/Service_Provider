@@ -52,7 +52,7 @@ const Admin = () => {
           <div className=" flex flex-col font-medium">
             <div>
             
-              Addhar Number <span className=" text-red-500">*</span>
+            Aadhaar Number <span className=" text-red-500">*</span>
             </div>
             <input
               className=" px-2 h-[40px] outline-none rounded-md  border-2 border-gray-200"
