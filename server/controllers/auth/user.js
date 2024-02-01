@@ -2,9 +2,8 @@ import {User} from "../../models/Auth/user.js"
 import bcrypt from "bcrypt"
 import {sendCookie} from "../../utils/features.js"
 
-
 // *********************** Register API **********************
-export const register=async(req,res)=>{
+export const register=async(req,res,next)=>{
     try{
         const {Full_Name,Mobile_Number, User_Type,Password}=req.body;
         //find user exist or not 
@@ -23,6 +22,10 @@ export const register=async(req,res)=>{
             const hashedPassword =await bcrypt.hash(Password,10);
             user= await User.create({Full_Name, Mobile_Number, User_Type,  Password:hashedPassword});
             sendCookie(user ,res,"Register Successfully",201);
+            return res.status(404).json({
+                success:false,
+                 user
+            });
             return res.status(201).json({
                 success:true,
                 message:"user register",
@@ -30,12 +33,12 @@ export const register=async(req,res)=>{
         }
     }
     catch(error){
-        res.status(401).json({
-            message:"something wrong",
-            success:false,
-            user:req.user,
-        })
-        console.log(error)
+        // res.status(401).json({
+        //     message:"something wrong",
+        //     success:false,
+        //     user:req.user,
+        // })
+        // console.log(error)
     }
 }
 

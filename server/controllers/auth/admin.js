@@ -23,19 +23,19 @@ export const register=async(req,res)=>{
             const hashedPassword =await bcrypt.hash(Password,10);
             user= await Admin.create({Full_Name, Mobile_Number, User_Type,  Password:hashedPassword});
             sendCookie(user ,res,"Register Successfully",201);
-            return res.status(201).json({
+            res.status(201).json({
                 success:true,
                 message:"user register",
             });
         }
     }
     catch(error){
-        res.status(401).json({
+       return res.status(401).json({
             message:"something wrong",
             success:false,
             user:req.user,
         })
-        console.log(error)
+        // console.log(error)
     }
 }
 

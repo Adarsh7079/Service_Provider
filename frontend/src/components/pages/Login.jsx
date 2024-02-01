@@ -6,17 +6,12 @@ const Login = () => {
     const navigate=useNavigate();
     const[isAdmin,setAdmin]=useState(false);
     const [FormData,setData]=useState({
-        mobileno:"",password:""
+        Mobile_Number:"",Password:""
     });
     const [backendData,setBackEndData]=useState([{}]);
 
     useEffect(()=>{
-        fetch("http://localhost:4000/service/v1/users/login").then(response=>response.json()
-        ).then(
-            data=>{
-                setBackEndData(data)
-            }
-        )
+       
     },[])
     const handleInput=(e)=>{
         e.preventDefault();
@@ -26,18 +21,40 @@ const Login = () => {
             return{...e,[name]:value};
         });
     };
-    console.log(FormData);
+    // console.log(FormData);
 
     
-    const handleSubmit=(e)=>{
+    const handleSubmit=async(e)=>{
         e.preventDefault();
-         if(isAdmin)
-         {
+        try{
+            const user= await fetch(`http://localhost:4000/service/v1/users/login`,{
+            method:"POST",
+            headers:{
+                'Content-Type':"application/json",
+            },
+            body:JSON.stringify(FormData)
+        });
+        const worker= await fetch(`http://localhost:4000/service/v1/admin/login`,{
+            method:"POST",
+            headers:{
+                'Content-Type':"application/json",
+            },
+            body:JSON.stringify(FormData)
+        });
+
+        if(user.status==200 && worker.status==401)
+        {
+            navigate('/user')
+        }
+        else if(user.status==401 && worker.status==200){
             navigate('/admin')
-         }
-         else{
-            navigate('/admin')
-         }
+        }
+
+        }
+        catch(error){
+            console.log("register error ",error)
+        }
+        
     }
    
   return (
@@ -49,13 +66,13 @@ const Login = () => {
                 <div className=' underline text-4xl font-bold'>Login</div>
               
                 <label className=' flex flex-col font-semibold'>
-                    Mobileno
+                    Mobile_Number
                     <input className=' border-2 border-gray-300 rounded-md h-[40px] px-2'
-                    type="mobileno"
-                    id="mobileno"
-                    name="mobileno"
+                    type="Mobile_Number"
+                    id="Mobile_Number"
+                    name="Mobile_Number"
                     onChange={handleInput}
-                    value={FormData.mobileno}
+                    value={FormData.Mobile_Number}
                    
                     />
                 </label>
@@ -64,10 +81,10 @@ const Login = () => {
                     Password
                     <input className=' border-2 border-gray-300 rounded-md h-[40px] px-2'
                       type="text"
-                      id="password"
-                      name="password"
+                      id="Password"
+                      name="Password"
                       onChange={handleInput}
-                      value={FormData.password}
+                      value={FormData.Password}
                      />
                 </label>
                 <Link to='/signup' className=' text-blue-500 -mt-4 hover:text-blue-600 transition duration-300'>Don't have an account?</Link>

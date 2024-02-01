@@ -21,11 +21,14 @@ const schema =new mongoose.Schema({
     },
     Aadhaar:{
       type:Number,
-      unique:true
+      
+     
     },
     Image:{
       data: Buffer,
-      contentType: String
+      contentType: String,
+      
+
     },
     Job_Type:{
       type:String,
@@ -34,7 +37,7 @@ const schema =new mongoose.Schema({
       type:Number
     },
     Age:{
-      type:Number
+      type:String
     }
 });
 
