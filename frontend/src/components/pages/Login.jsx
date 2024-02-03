@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { Link, Outlet, useNavigate } from 'react-router-dom'
-
+import axios from 'axios';
 
 const Login = () => {
     const navigate=useNavigate();
@@ -21,19 +21,23 @@ const Login = () => {
             return{...e,[name]:value};
         });
     };
-    // console.log(FormData);
+    console.log(FormData);
 
     
     const handleSubmit=async(e)=>{
+      
         e.preventDefault();
         try{
-            const user= await fetch(`http://localhost:4000/service/v1/users/login`,{
+          
+           const user= await fetch(`http://localhost:4000/service/v1/users/login`,{
             method:"POST",
             headers:{
                 'Content-Type':"application/json",
             },
             body:JSON.stringify(FormData)
-        });
+       });
+
+      
         const worker= await fetch(`http://localhost:4000/service/v1/admin/login`,{
             method:"POST",
             headers:{
@@ -41,19 +45,27 @@ const Login = () => {
             },
             body:JSON.stringify(FormData)
         });
+        
 
-        if(user.status==200 && worker.status==401)
+        if(!user || !worker)
         {
-            // navigate('/user')
-            navigate('/admin')
+            console.log("error hai ");
         }
-        else if(worker.status==200 && user.status==401){
+        else
+        {
+        if(user.status==200 && worker.status==404)
+        {
+            
+            navigate('/user')
+        }
+        else if(worker.status==200 && user.status==404){
             navigate('/admin')
         }
 
+        }
         }
         catch(error){
-            console.log("register error ",error)
+            console.log("Login error ",error)
         }
         
     }

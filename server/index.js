@@ -6,7 +6,6 @@ import cookieParser from 'cookie-parser';
 import cors from "cors";
 import userRouter from "./routes/user.js";
 import adminRouter from "./routes/Admin.js";
-import { errorMiddleware } from "./middlewares/error.js";
 
 
 const app=express();
@@ -41,4 +40,3 @@ const port =process.env.PORT;
 });
 
 
-app.use(errorMiddleware)

@@ -30,13 +30,13 @@ export const register=async(req,res,next)=>{
         }
     }
     catch(error){
-        // res.status(401).json({
-        //     message:"something wrong",
-        //     success:false,
-        //     user:req.user,
-        // })
-        // console.log(error)
-        next(error)
+        res.status(401).json({
+            message:"something wrong",
+            success:false,
+            user:req.user,
+        })
+        console.log(error)
+        // next(error)
     }
 }
 
@@ -44,7 +44,7 @@ export const register=async(req,res,next)=>{
 export const  login=async(req,res)=>{
     try{
         const {Mobile_Number,Password}=req.body;
-        const user =await User.findOne({Mobile_Number}).select("+Password");
+        const user =await User.findOne({Mobile_Number});
         if(!user) {
             return res.status(404).json({
                 success:false,
@@ -54,17 +54,22 @@ export const  login=async(req,res)=>{
 
 
         const isMatch = await bcrypt.compare(Password,user.Password);
-        if(!isMatch) return next(new ErrorHandler("Invalid Email & passwptd not found",400));
+        if(!isMatch) {
+            return res.status(404).json({
+                success:false,
+                message:"invalid credientail ",
+            });
+        }
         sendCookie(user,res,`welcome back ${user.Full_Name}`);
     }
     catch(error){
-        // res.status(401).json({
-        //     message:"wrong crediential",
-        //     success:false,
-        //     user:req.user,
-        // })
-        // console.log(error)
-        next(error)
+        res.status(401).json({
+            message:"wrong crediential",
+            success:false,
+            user:req.user,
+        })
+        console.log(error)
+        // next(error)
     }
 };
 // *******  Get LogOut API  ***** */

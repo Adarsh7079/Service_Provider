@@ -16,6 +16,7 @@ const [data,setData]=useState([]);
         console.log(e.response);
       });
   },[]);
+  console.log(data)
   
   return (
     <div className=" mt-32 px-[15%]">

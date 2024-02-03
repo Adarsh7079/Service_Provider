@@ -10,7 +10,7 @@ function App() {
     <div className=' w-full '>
       <NavBar isLogin={isLogin} setLogin={setLogin}/>
       <Routes>
-        {/* <Route path="/" element={ <Main/>}/> */}
+        <Route path="/" element={ <Main/>}/>
         <Route path="/admin" element={<Admin/>}/>
         <Route path="/user" element={<User/>}/>
         <Route path="/signup" element={<Signup/>}/>
