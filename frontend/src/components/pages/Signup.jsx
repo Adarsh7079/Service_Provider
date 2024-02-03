@@ -69,13 +69,14 @@ const Signup = () => {
             </label>
                <label className=' flex flex-col font-semibold'>
                     User Type
+                    
                     <select 
                      id="User_Type"
                      name='User_Type'
                      value={FormData.User_Type}
                      onChange={handleInput}
                     className=' border-2 border-gray-300 rounded-md h-[40px] px-2 bg-white'>
-                        <option  >---Select Type---</option>
+                       
                         <option  onChange={handleInput} value="Worker">Worker</option>
                         <option value="User">Customer</option>
                     </select>

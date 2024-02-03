@@ -1,16 +1,22 @@
-import React from "react";
+import React, { useState,useEffect } from "react";
+import axios from 'axios';
 
 const Admin = () => {
-  const data = [
-    {
-      name: `Adarsh Paritosh`,
-      image: `asdasd`,
-      jobtype: `Elec`,
-      Total_Experince: `1`,
-      mobileno: `121212312312`,
-      age: "12",
-    },
-  ];
+const [data,setData]=useState([]);
+  useEffect(() => {
+    axios
+      .get(`http://localhost:4000/service/v1/admin/me`, {
+        withCredentials: true,
+      })
+      .then((res) => {
+        setData(res.data.service);
+        
+      })
+      .catch((e) => {
+        console.log(e.response);
+      });
+  },[]);
+  
   return (
     <div className=" mt-32 px-[15%]">
       <div className=" flex justify-between">
@@ -32,7 +38,7 @@ const Admin = () => {
             </div>
             <input
               className=" px-2 h-[40px] outline-none rounded-md  border-2 border-gray-200"
-              value="asdasd"
+              value="ada"
               readonly="readonly"
             />
           </div>

@@ -1,6 +1,7 @@
 import {User} from "../../models/Auth/user.js"
 import bcrypt from "bcrypt"
 import {sendCookie} from "../../utils/features.js"
+import ErrorHandler from "../../middlewares/error.js"
 
 // *********************** Register API **********************
 export const register=async(req,res,next)=>{
@@ -22,10 +23,6 @@ export const register=async(req,res,next)=>{
             const hashedPassword =await bcrypt.hash(Password,10);
             user= await User.create({Full_Name, Mobile_Number, User_Type,  Password:hashedPassword});
             sendCookie(user ,res,"Register Successfully",201);
-            return res.status(404).json({
-                success:false,
-                 user
-            });
             return res.status(201).json({
                 success:true,
                 message:"user register",
@@ -39,6 +36,7 @@ export const register=async(req,res,next)=>{
         //     user:req.user,
         // })
         // console.log(error)
+        next(error)
     }
 }
 
@@ -47,7 +45,12 @@ export const  login=async(req,res)=>{
     try{
         const {Mobile_Number,Password}=req.body;
         const user =await User.findOne({Mobile_Number}).select("+Password");
-        if(!user)   return next(new ErrorHandler("Invalid Email & passwptd not found",400));
+        if(!user) {
+            return res.status(404).json({
+                success:false,
+                message:"invalid credientail ",
+            });
+        }
 
 
         const isMatch = await bcrypt.compare(Password,user.Password);
@@ -55,14 +58,15 @@ export const  login=async(req,res)=>{
         sendCookie(user,res,`welcome back ${user.Full_Name}`);
     }
     catch(error){
-        res.status(401).json({
-            message:"wrong crediential",
-            success:false,
-            user:req.user,
-        })
-        console.log(error)
+        // res.status(401).json({
+        //     message:"wrong crediential",
+        //     success:false,
+        //     user:req.user,
+        // })
+        // console.log(error)
+        next(error)
     }
-}
+};
 // *******  Get LogOut API  ***** */
 
 export const logout=(req,res)=>{
@@ -76,4 +80,12 @@ export const logout=(req,res)=>{
         success:true,
         user:req.user,
     })
-}
+};
+// **************** get user API  ****************
+
+export  const getMyProfile=(req,res)=>{
+    res.status(200).json({
+        success:true,
+        user:req.user,
+    })
+};

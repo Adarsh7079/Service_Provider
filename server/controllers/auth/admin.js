@@ -3,8 +3,9 @@ import bcrypt from "bcrypt"
 import {sendCookie} from "../../utils/features.js"
 
 
+
 // *********************** Register API **********************
-export const register=async(req,res)=>{
+export const register=async(req,res,next)=>{
     try{
         const {Full_Name,Mobile_Number, User_Type,Password}=req.body;
         //find user exist or not 
@@ -30,36 +31,41 @@ export const register=async(req,res)=>{
         }
     }
     catch(error){
-       return res.status(401).json({
-            message:"something wrong",
-            success:false,
-            user:req.user,
-        })
+    //    return res.status(401).json({
+    //         message:"something wrong",
+    //         success:false,
+    //         user:req.user,
+    //     })
         // console.log(error)
+        next(error);
     }
-}
+};
 
 // ************ LOGIN API ****************
-export const login=async(req,res)=>{
+export const login=async(req,res,next)=>{
     try{
         const {Mobile_Number,Password}=req.body;
         const user =await Admin.findOne({Mobile_Number}).select("+Password");
-        if(!user)   return next(new ErrorHandler("Invalid Email & passwptd not found",400));
-
-
+        if(!user)  {
+            return res.status(404).json({
+                success:false,
+                message:"invalid credientail ",
+            });
+        }
         const isMatch = await bcrypt.compare(Password,user.Password);
         if(!isMatch) return next(new ErrorHandler("Invalid Email & passwptd not found",400));
         sendCookie(user,res,`welcome back ${user.Full_Name}`);
     }
     catch(error){
-        res.status(401).json({
-            message:"wrong crediential",
-            success:false,
-            user:req.user,
-        })
-        console.log(error)
+        // res.status(401).json({
+        //     message:"wrong crediential",
+        //     success:false,
+        //     user:req.user,
+        // })
+        // console.log(error)
+        next(error);
     }
-}
+};
 // *******  Get LogOut API  ***** */
 
 export const logout=(req,res)=>{
@@ -73,4 +79,13 @@ export const logout=(req,res)=>{
         success:true,
         user:req.user,
     })
-}
+};
+
+export  const getMyProfile=(req,res)=>{
+ 
+    res.status(200).json({
+        success:true,
+        user:req.user,
+    })
+    console.log("data",req.user)
+};

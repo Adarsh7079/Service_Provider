@@ -5,7 +5,8 @@ import {connectDB} from "./data/database.js";
 import cookieParser from 'cookie-parser';
 import cors from "cors";
 import userRouter from "./routes/user.js";
-import adminRouter from "./routes/Admin.js"
+import adminRouter from "./routes/Admin.js";
+import { errorMiddleware } from "./middlewares/error.js";
 
 
 const app=express();
@@ -39,3 +40,5 @@ const port =process.env.PORT;
     console.log(`app is runbning ${port}`)
 });
 
+
+app.use(errorMiddleware)

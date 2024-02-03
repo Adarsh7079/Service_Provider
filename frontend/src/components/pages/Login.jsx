@@ -44,9 +44,10 @@ const Login = () => {
 
         if(user.status==200 && worker.status==401)
         {
-            navigate('/user')
+            // navigate('/user')
+            navigate('/admin')
         }
-        else if(user.status==401 && worker.status==200){
+        else if(worker.status==200 && user.status==401){
             navigate('/admin')
         }
 
