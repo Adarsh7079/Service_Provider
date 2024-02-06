@@ -6,6 +6,7 @@ import cookieParser from 'cookie-parser';
 import cors from "cors";
 import userRouter from "./routes/user.js";
 import adminRouter from "./routes/Admin.js";
+import ErrorHandler, { errorMiddleware } from "./middlewares/error.js";
 
 
 const app=express();
@@ -30,6 +31,7 @@ app.use(
 //using routes
 app.use("/service/v1/users",userRouter);
 app.use("/service/v1/admin",adminRouter);
+app.use(errorMiddleware)
 
 app.get("/",(req,res)=>{
     res.send("hello dear");

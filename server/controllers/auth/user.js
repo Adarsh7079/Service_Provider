@@ -13,10 +13,8 @@ export const register=async(req,res,next)=>{
         //if user exist 
         if(user)
         {
-            return res.status(404).json({
-                success:false,
-                message:"user exist",
-            });
+            return next(new ErrorHandler("user already register",401));
+
         }
         else
         {
@@ -30,46 +28,42 @@ export const register=async(req,res,next)=>{
         }
     }
     catch(error){
-        res.status(401).json({
-            message:"something wrong",
-            success:false,
-            user:req.user,
-        })
-        console.log(error)
-        // next(error)
+        // res.status(401).json({
+        //     message:"something wrong",
+        //     success:false,
+        //     user:req.user,
+        // })
+        // console.log(error)
+        next(error)
     }
 }
 
 // ************ LOGIN API ****************
-export const  login=async(req,res)=>{
+export const  login=async(req,res,next)=>{
     try{
         const {Mobile_Number,Password}=req.body;
         const user =await User.findOne({Mobile_Number});
         if(!user) {
-            return res.status(404).json({
-                success:false,
-                message:"invalid credientail ",
-            });
+            return next(new ErrorHandler("user not found",401));
+
         }
 
 
         const isMatch = await bcrypt.compare(Password,user.Password);
         if(!isMatch) {
-            return res.status(404).json({
-                success:false,
-                message:"invalid credientail ",
-            });
+            return next(new ErrorHandler("Invalid Credientauil",401));
+
         }
         sendCookie(user,res,`welcome back ${user.Full_Name}`);
     }
     catch(error){
-        res.status(401).json({
+       return res.status(401).json({
             message:"wrong crediential",
             success:false,
             user:req.user,
         })
         console.log(error)
-        // next(error)
+       // next(error)
     }
 };
 // *******  Get LogOut API  ***** */

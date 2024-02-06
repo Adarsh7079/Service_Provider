@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { CiSearch } from "react-icons/ci";
 
 const workerdata=[
@@ -27,6 +27,32 @@ const workerdata=[
     }
 ]
 const SearchUser = () => {
+    const[useData,setData]=useState();
+    const fetchData = async(e) => {
+      
+        try{
+          
+            const user= await fetch(`http://localhost:4000/service/v1/admin/all`,{
+             method:"POST",
+             headers:{
+                 'Content-Type':"application/json",
+             },
+            
+            });
+            setData(user);
+            console.log('user gt',user.user)
+        }
+        catch(error)
+        {
+            console.log("Login error ",error)
+        }
+      };
+
+      useEffect(()=>{
+        fetchData()
+      },[])
+
+      console.log("data",useData)
   return (
     <div className=' mt-20'>
         <div>
@@ -42,8 +68,8 @@ const SearchUser = () => {
                 <label className=' flex flex-col font-semibold'>
                     User Type
                     <select className=' border-2 border-gray-300 rounded-md h-[40px] px-2 bg-white'>
-                        <option clas >---Filter Type---</option>
-                        <option  onChange={() => setAdmin((prev) => !prev)} value="Worker">Electrician</option>
+                        <option  >---Filter Type---</option>
+                        <option  onChange={() => setAdmin((prev) => !prev)} value="Worker"></option>
                         <option value="User">Plumber</option>
                     </select>
                 </label>

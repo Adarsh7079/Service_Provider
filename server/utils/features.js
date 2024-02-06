@@ -14,7 +14,8 @@ export const sendCookie=(user , res, message , statucode=200)=>{
 
     }).json({
        success:true,
-       message
+       message,
+       user:user._id
     });
    
 }; 

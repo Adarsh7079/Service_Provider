@@ -1,11 +1,12 @@
 import {Admin} from "../../models/Auth/Admin.js"
 import bcrypt from "bcrypt"
 import {sendCookie} from "../../utils/features.js"
+import ErrorHandler from "../../middlewares/error.js";
 
 
 
 // *********************** Register API **********************
-export const register=async(req,res)=>{
+export const register=async(req,res,next)=>{
     try{
         const {Full_Name,Mobile_Number, User_Type,Password}=req.body;
         //find user exist or not 
@@ -14,10 +15,8 @@ export const register=async(req,res)=>{
         //if user exist 
         if(user)
         {
-            return res.status(404).json({
-                success:false,
-                message:"user exist",
-            });
+            return next(new ErrorHandler("user already register",401));
+
         }
         else
         {
@@ -31,44 +30,41 @@ export const register=async(req,res)=>{
         }
     }
     catch(error){
-        res.status(401).json({
-            message:"something wrong",
-            success:false,
-            user:req.user,
-        })
-        console.log(error)
-        // next(error);
+        // res.status(401).json({
+        //     message:"something wrong",
+        //     success:false,
+        //     user:req.user,
+        // })
+        // console.log(error)
+        next(error);
     }
 };
 
 // ************ LOGIN API ****************
-export const login=async(req,res)=>{
+export const login=async(req,res,next)=>{
     try{
         const {Mobile_Number,Password}=req.body;
         const user =await Admin.findOne({Mobile_Number}).select("+Password");
         if(!user)  {
-            return res.status(404).json({
-                success:false,
-                message:"invalid credientail ",
-            });
+            return next(new ErrorHandler("user not found",401));
+
         }
         const isMatch = await bcrypt.compare(Password,user.Password);
         if(!isMatch) {
-            return res.status(404).json({
-                success:false,
-                message:"invalid credientail ",
-            });
+            return next(new ErrorHandler("Invalid Credientauil",401));
+
         }
+      
        sendCookie(user,res,`welcome back ${user.Full_Name}`) ;
     }
     catch(error){
-       res.status(401).json({
+     return   res.status(401).json({
             message:"wrong crediential",
             success:false,
             user:req.user,
         })
         console.log(error)
-        // next(error);
+       // next(error);
     }
 };
 // *******  Get LogOut API  ***** */
@@ -94,3 +90,18 @@ export  const getMyProfile=(req,res)=>{
     })
     console.log("data")
 };
+export const getall=async(req,res,next)=>{
+    try {
+        const users =await Admin.find({});
+    
+        const keyword =req.query.keyword;
+        console.log(keyword);
+    
+        res.json({
+            success:true,
+            user:users,
+        });
+       } catch (error) {
+        next(error);
+       }
+}
