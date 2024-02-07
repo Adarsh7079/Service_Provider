@@ -28,15 +28,24 @@ const Signup = () => {
             api=`http://localhost:4000/service/v1/users/new`
         }
         try{
-            const response= await fetch(api,{
-            method:"POST",
-            headers:{
-                'Content-Type':"application/json",
-            },
-            body:JSON.stringify(FormData)
-        });
-        console.log("response",response)
-        navigate('/login')
+                const response= await fetch(api,{
+                method:"POST",
+                headers:{
+                    'Content-Type':"application/json",
+                },
+                body:JSON.stringify(FormData)
+            });
+            console.log(response.status)
+            if(response.status===401)
+            {
+                window.alert("errro occur")
+            }
+            else if(response.status===201)
+            {
+                navigate("/login")
+            }
+           
+               
         }
         catch(error){
             console.log("register error ",error)
@@ -76,9 +85,9 @@ const Signup = () => {
                      value={FormData.User_Type}
                      onChange={handleInput}
                     className=' border-2 border-gray-300 rounded-md h-[40px] px-2 bg-white'>
-                       
+                       <option  >Option</option>
                         <option  onChange={handleInput} value="Worker">Worker</option>
-                        <option value="User">Customer</option>
+                        <option   onChange={handleInput}  value="User">Customer</option>
                     </select>
                 </label>
            

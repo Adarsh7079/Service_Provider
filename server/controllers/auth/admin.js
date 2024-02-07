@@ -20,14 +20,19 @@ export const register=async(req,res,next)=>{
         }
         else
         {
-            const hashedPassword =await bcrypt.hash(Password,10);
-            user= await Admin.create({Full_Name, Mobile_Number, User_Type,  Password:hashedPassword});
-            sendCookie(user ,res,"Register Successfully",201);
-            res.status(201).json({
-                success:true,
+            // const hashedPassword =await bcrypt.hash(Password,10);
+            // user= await Admin.create({Full_Name, Mobile_Number, User_Type,  Password:hashedPassword});
+            // // sendCookie(user ,res,"Register Successfully",201);
+            // res.status(201).json({
+            //     success:true,
+            //     message:"user register",
+            // });
+        }
+        const resp=new Admin({Full_Name, Mobile_Number, User_Type,Password});
+        await resp.save();
+        res.status(201).json({
                 message:"user register",
             });
-        }
     }
     catch(error){
         // res.status(401).json({
@@ -42,20 +47,41 @@ export const register=async(req,res,next)=>{
 
 // ************ LOGIN API ****************
 export const login=async(req,res,next)=>{
+    let token
     try{
         const {Mobile_Number,Password}=req.body;
-        const user =await Admin.findOne({Mobile_Number}).select("+Password");
+        if(!Mobile_Number || !Password)
+        {
+            return res.status(400).json({error:"Please fill the data "})
+        }
+        const user =await Admin.findOne({Mobile_Number});
+        
         if(!user)  {
-            return next(new ErrorHandler("user not found",401));
+            return res.status(400).json({error:"bad request "})
 
         }
-        const isMatch = await bcrypt.compare(Password,user.Password);
-        if(!isMatch) {
-            return next(new ErrorHandler("Invalid Credientauil",401));
+        else
+        {
+            const isMatch = await bcrypt.compare(Password,user.Password);
 
+            token=await user.generateAuthToken();
+           // console.log(token)
+            res.cookie("jwtoken",token,{
+                expires:new Date(Date.now()+25892000000),
+                httpOnly:true
+            });
+            if(!isMatch) {
+                return next(new ErrorHandler("Invalid Credientauil",401));
+    
+            }
+            else
+            {
+                res.json({message:"user login successfully "})
+            }
+          
+          // sendCookie(user,res,`welcome back ${user.Full_Name}`) ;
         }
-      
-       sendCookie(user,res,`welcome back ${user.Full_Name}`) ;
+       
     }
     catch(error){
      return   res.status(401).json({
@@ -70,25 +96,12 @@ export const login=async(req,res,next)=>{
 // *******  Get LogOut API  ***** */
 
 export const logout=(req,res)=>{
-    res
-    .status(200)
-    .cookie("token","",{
-        expires:new Date(Date.now()),
-        sameSite:process.env.NODE_ENV==="Development" ?"lax":"none",
-        secure:process.env.NODE_ENV==="Development" ?false:true,
-    }).json({
-        success:true,
-        user:req.user,
-    })
+    res.clearCookie('jwtoken',{path:"/"});
+    res.status(200).send('User logout');
 };
 
-export  const getMyProfile=(req,res)=>{
- 
-    res.status(200).json({
-        success:true,
-        user:req.user,
-    })
-    console.log("data")
+export  const getMyProfile=(req,res,next)=>{
+    res.send(req.rootuser)
 };
 export const getall=async(req,res,next)=>{
     try {

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { CiSearch } from "react-icons/ci";
+import axios from 'axios';
 
 const workerdata=[
     {
@@ -27,36 +28,46 @@ const workerdata=[
     }
 ]
 const SearchUser = () => {
-    const[useData,setData]=useState();
-    const fetchData = async(e) => {
+    const[userData,setData]=useState([]);
+    // const fetchData = async(e) => {
       
-        try{
+    //     try{
           
-            const user= await fetch(`http://localhost:4000/service/v1/admin/all`,{
-             method:"POST",
-             headers:{
-                 'Content-Type':"application/json",
-             },
+    //         const user= await fetch(`http://localhost:4000/service/v1/admin/all`,{
+    //          method:"POST",
+    //          headers:{
+    //              'Content-Type':"application/json",
+    //          },
             
-            });
-            setData(user);
-            console.log('user gt',user.user)
-        }
-        catch(error)
-        {
-            console.log("Login error ",error)
-        }
-      };
+    //         });
+    //         setData(user);
+    //         console.log('user gt',user.user)
+    //     }
+    //     catch(error)
+    //     {
+    //         console.log("Login error ",error)
+    //     }
+    //   };
 
-      useEffect(()=>{
-        fetchData()
-      },[])
-
-      console.log("data",useData)
+      useEffect(() => {
+        axios
+          .get(`http://localhost:4000/service/v1/admin/all`, {
+            withCredentials: true,
+          })
+          .then((res) => {
+            setData(res.data.user);
+            workerdata(setData)
+            
+          })
+          .catch((e) => {
+            console.log(e)
+          });
+      },[]);
+      console.log("data",userData)
   return (
-    <div className=' mt-20'>
-        <div>
-            <form className=' relative flex gap-2' >
+    <div className=' mt-20 w-full '>
+        <div className='h-screen'>
+            <form className=' relative flex gap-2 ' >
                 <CiSearch className=' absolute w-[30px] h-[30px] mt-2 mx-2 text-gray-400 ' />
                 <input
                     type="serach"
@@ -77,24 +88,28 @@ const SearchUser = () => {
             <div className=' rounded-md mt-2 px-2 bg-white'>
 
                 <div className=' border-b-2 border-gray-300 flex justify-between px-5 py-2'>
-                    <div>Full Name</div>
-                    <div>Mobile No</div>
-                    <div>Experience</div>
-                    <div>Address</div>
+                    <div className='w-[150px]'>Full Name</div>
+                    <div className='w-[150px]'>Mobile No</div>
+                    <div className='w-[150px]'>Experience</div>
+                    <div className='w-[150px]'>Address</div>
                 </div>
                 <div>
-                   {
-                    workerdata.map((data,index)=>{
-                        return<div index={index}
-                        className=' flex justify-between px-5 py-2'>
-                            <div>{data.fullname}</div>
-                            <div>{data.mobileno}</div>
-                            <div>{data.Experience}</div>
-                            <div>{data.addess}</div>
-                           
-                        </div>
-                    })
-                   }
+                {
+                    userData.length===0 ? (<div className=' flex justify-center mt-10 text-[3rem]'>Data Not Found</div>):(
+                      <div>
+                          {userData.map((data, index) => {
+                            return (
+                              <div key={index} className='flex justify-between px-5 py-2'>
+                                <div className='w-[150px]'>{data.Full_Name}</div>
+                                <div className='w-[150px]'>{data.Mobile_Number}</div>
+                                <div className='w-[150px]'>{data.Work_Experience}</div>
+                                <div className='w-[150px]'>{data.Address}</div>
+                              </div>
+                            );
+                          })}
+                      </div>
+                    )
+                }
                 </div>
             </div>
         </div>

@@ -18,13 +18,19 @@ export const register=async(req,res,next)=>{
         }
         else
         {
-            const hashedPassword =await bcrypt.hash(Password,10);
-            user= await User.create({Full_Name, Mobile_Number, User_Type,  Password:hashedPassword});
-            sendCookie(user ,res,"Register Successfully",201);
-            return res.status(201).json({
-                success:true,
-                message:"user register",
-            });
+            // const hashedPassword =await bcrypt.hash(Password,10);
+            // user= await User.create({Full_Name, Mobile_Number, User_Type,  Password:hashedPassword});
+            // sendCookie(user ,res,"Register Successfully",201);
+            // return res.status(201).json({
+            //     success:true,
+            //     message:"user register",
+            // });
+
+            const resp=new User({Full_Name, Mobile_Number, User_Type,Password});
+            await resp.save();
+            res.status(201).json({
+                    message:"user register",
+                });
         }
     }
     catch(error){
@@ -40,21 +46,41 @@ export const register=async(req,res,next)=>{
 
 // ************ LOGIN API ****************
 export const  login=async(req,res,next)=>{
+    let token
     try{
         const {Mobile_Number,Password}=req.body;
+        if(!Mobile_Number || !Password)
+        {
+            return res.status(400).json({error:"Please fill the data "})
+        }
         const user =await User.findOne({Mobile_Number});
-        if(!user) {
-            return next(new ErrorHandler("user not found",401));
+        
+        if(!user)  {
+            return res.status(400).json({error:"bad request "})
 
         }
+        else
+        {
+            const isMatch = await bcrypt.compare(Password,user.Password);
 
-
-        const isMatch = await bcrypt.compare(Password,user.Password);
-        if(!isMatch) {
-            return next(new ErrorHandler("Invalid Credientauil",401));
-
+            token=await user.generateAuthToken();
+            // console.log(token)
+            res.cookie("jwtoken",token,{
+                expires:new Date(Date.now()+25892000000),
+                httpOnly:true
+            });
+            if(!isMatch) {
+                return next(new ErrorHandler("Invalid Credientauil",401));
+    
+            }
+            else
+            {
+                res.json({message:"user logimn successfully "})
+            }
+          
+          // sendCookie(user,res,`welcome back ${user.Full_Name}`) ;
         }
-        sendCookie(user,res,`welcome back ${user.Full_Name}`);
+       
     }
     catch(error){
        return res.status(401).json({
@@ -62,7 +88,7 @@ export const  login=async(req,res,next)=>{
             success:false,
             user:req.user,
         })
-        console.log(error)
+      //  console.log(error)
        // next(error)
     }
 };

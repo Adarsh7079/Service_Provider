@@ -1,10 +1,13 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState , useContext} from 'react'
 import { Link, Outlet, useNavigate } from 'react-router-dom'
-import axios from 'axios';
+import {UserContext} from "../../App"
 
 const Login = () => {
     const navigate=useNavigate();
-    const[isAdmin,setAdmin]=useState(false);
+  
+    const {state,dispatch}=useContext(UserContext);
+
+
     const [FormData,setData]=useState({
         Mobile_Number:"",Password:""
     });
@@ -21,7 +24,7 @@ const Login = () => {
             return{...e,[name]:value};
         });
     };
-    console.log(FormData);
+    // console.log(FormData);
 
     
     const handleSubmit=async(e)=>{
@@ -29,7 +32,7 @@ const Login = () => {
         e.preventDefault();
         try{
           
-           const user= await fetch(`http://localhost:4000/service/v1/users/login`,{
+           const users= await fetch(`http://localhost:4000/service/v1/users/login`,{
             method:"POST",
             headers:{
                 'Content-Type':"application/json",
@@ -43,23 +46,35 @@ const Login = () => {
             headers:{
                 'Content-Type':"application/json",
             },
+            credentials:"include",
             body:JSON.stringify(FormData)
         });
+        let data
         
-
-        if(!user || !worker)
+        if(!users || !worker)
         {
             console.log("error hai ");
         }
         else
         {
-        if(user.status==200 && worker.status==401)
+        if(users.status==200 )
         {
-            
+
+            data=users.json();
+           dispatch({type:"USER",payload:true})
+            window.alert("login successfuly")
             navigate('/user')
         }
-        else if(worker.status==200 && user.status==401){
+        else if(worker.status==200 ){
+            data=worker.json();
+            dispatch({type:"USER",payload:true})
+            window.alert("login successfuly")
             navigate('/admin')
+       
+        }
+        else
+        {
+            window.alert("error occur")
         }
 
         }
@@ -69,7 +84,8 @@ const Login = () => {
         }
         
     }
-   
+    // console.log("user data ",user);
+  
   return (
     <div className=' w-full overflow-x-hidden'>
         <div className=' flex items-center justify-center mt-[130px] mb-[100px]   '>
